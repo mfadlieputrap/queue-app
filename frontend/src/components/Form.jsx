@@ -1,6 +1,8 @@
 import { useState } from "react"
+import { useNavigate } from 'react-router-dom'
 
 export default function Form (){
+    const navigate = useNavigate()
     const [inputs, setInputs] = useState({})
 
     const handleChange = (event) => {
@@ -15,6 +17,7 @@ export default function Form (){
         const keperluan = inputs.keperluan || ""
         if(nama !== "" && keperluan !== ""){
             confirm(`Halo ${nama}, apakah keperluan kamu adalah ${keperluan}`)
+            navigate('/ticket', {state: {nama}})
         }else{
             alert("Mohon masukan nama dan keperluan anda")
         }
@@ -23,11 +26,8 @@ export default function Form (){
 
     return(
         <>
-            <div className='w-full bg-rose-800 h-28'>
-                halo
-            </div>
-            <div className='divForm w-1/5 m-auto mt-64 rounded-2xl shadow-lg h-max'>
-                <h2  className="mx-auto w-max font-semibold text-2xl pt-12 pb-11">Pengajuan Surat-Surat</h2>
+            <div className='center absolute divForm w-2/5  rounded-2xl shadow-lg h-max'>
+                <h2  className="mx-auto w-max font-semibold text-3xl pt-12 pb-11">Pengajuan Surat-Surat</h2>
                 <form onSubmit={handleSubmit}>
                     <div className=" grid grid-cols-1 w-3/4 m-auto ">
                         <label 
