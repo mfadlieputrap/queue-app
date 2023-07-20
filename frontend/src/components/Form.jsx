@@ -1,51 +1,79 @@
-import { useState, useEffect} from "react"
+import React, { useState, useEffect} from "react"
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 export default function Form (){
     const navigate = useNavigate()
     const [inputs, setInputs] = useState({})
-    const [number, setNumber] = useState(1)
-
+    const [number, setNumber] = useState(()=>{
+        // Get the initial number value from localStorage if it exists, otherwise default to 1
+        const storedNumber = sessionStorage.getItem("number");
+        return storedNumber ? parseInt(storedNumber) : 1;
+    })
+    const [showTicket, setShowTicket] = useState(false)
 
     useEffect(() => {
-        // Function to send the POST request when the number state changes
-        const sendPostRequest = async () => {
-          try {
-            const response = await fetch("http://localhost:3030/api/number", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ numbers: number }),
-            });
-    
-            const data = await response.json();
-            console.log("Response from server: ", data);
-          } catch (error) {
-            console.error("Error: ", error);
-          }
-        };
+        // Save the current number value to localStorage whenever it changes
+        sessionStorage.setItem("number", number);
+    }, [number]);
+    // useEffect(() => {
+    //     // Function to send the POST request when the number state changes
+    //     const sendPostRequest = async () => {
+    //     try {
+    //         const response = await fetch("http://localhost:3030/api/number", {
+    //             method: "POST",
+    //             headers: {
+    //             "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify({ numbers: number }),
+    //         });
 
-        sendPostRequest()
-    }, [number])
+    //         const data = await response.json();
+    //         console.log("Response from server: ", data);
+    //     } catch (error) {
+    //     console.error("Error: ", error);
+    //     }
+    //     };
+
+    //     sendPostRequest()
+    // }, [number])
 
 
-
+    const formatQueueNumber = (number)=>{
+        return number.toString().padStart(3,"0")
+    }
 
     const handleChange = (event) => {
         const name = event.target.name
         const value = event.target.value
         setInputs(values => ({...values, [name]: value}))
     }
-
+    
     const handleSubmit = (event) => {
         event.preventDefault()
         const nama = inputs.nama || ""
         const keperluan = inputs.keperluan || ""
         if(nama !== "" && keperluan !== ""){
-            setNumber(number + 1)
+            
+            setNumber((prevNumber) => prevNumber + 1);
+            axios.post("http://localhost:3030/api/number", {number: `${formatQueueNumber(number)}`})
+            .then((response) => {
+                console.log(response.data)
+            })
+            .catch((error)=>{
+                console.error(error)
+            })
             confirm(`Halo ${nama}, apakah keperluan kamu adalah ${keperluan}`)
-            navigate('/ticket', {state: {nama}})
+            setShowTicket(true)
+            
+            // Set a timer to navigate to another page after 3 seconds (adjust the time as needed)
+            setTimeout(() => {
+                setShowTicket(false)
+            }, 6000);
+            
+            
+            // navigate('/ticket', {state: {nama}})
+            
         }else{
             alert("Mohon masukan nama dan keperluan anda")
         }
@@ -54,10 +82,10 @@ export default function Form (){
 
     return(
         <>
-            <div className='center absolute divForm w-2/5  rounded-2xl shadow-lg h-max'>
-                <h2  className="mx-auto w-max font-semibold text-3xl pt-12 pb-11"></h2>
+            <div className={`absolute w-2/5 shadow-lg center divForm rounded-2xl h-max ${showTicket ? 'hidden': ''}`} id="divForm">
+                <h2  className="pt-12 mx-auto text-3xl font-semibold w-max pb-11"></h2>
                 <form onSubmit={handleSubmit}>
-                    <div className=" grid grid-cols-1 w-3/4 m-auto ">
+                    <div className="grid w-3/4 grid-cols-1 m-auto ">
                         <label 
                             htmlFor="nama"
                             className="mb-2 text-lg"
@@ -71,7 +99,7 @@ export default function Form (){
                             placeholder="Isi nama kamu"
                             value = { inputs.nama }
                             onChange={handleChange}
-                            className="field h-10 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                            className="h-10 field focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                         />
                         <label 
                             htmlFor="keperluan"
@@ -89,14 +117,20 @@ export default function Form (){
                         />
                         <button 
                             type="submit"
-                            className=" bg-blue-400 rounded-md p-4 text-white font-medium mt-3 mb-10 text-xl hover:bg-blue-500 active:bg-blue-700"
+                            className="p-4 mt-3 mb-10 text-xl font-medium text-white bg-blue-400 rounded-md hover:bg-blue-500 active:bg-blue-700"
                         >
                             Submit
                         </button>
                     </div>
                     
                 </form>
+                
             </div>
+            
+                <h1 className={`absolute text-3xl font-bold center ${showTicket ? '': 'hidden'}`} id="ticket">Halo {inputs.nama}, silahkan ambil nomor antrian anda</h1>
+            
+            
+            
         </>
     )
     
