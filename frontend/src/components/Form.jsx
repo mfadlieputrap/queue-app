@@ -1,9 +1,36 @@
-import { useState } from "react"
+import { useState, useEffect} from "react"
 import { useNavigate } from 'react-router-dom'
 
 export default function Form (){
     const navigate = useNavigate()
     const [inputs, setInputs] = useState({})
+    const [number, setNumber] = useState(1)
+
+
+    useEffect(() => {
+        // Function to send the POST request when the number state changes
+        const sendPostRequest = async () => {
+          try {
+            const response = await fetch("http://localhost:3030/api/number", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ numbers: number }),
+            });
+    
+            const data = await response.json();
+            console.log("Response from server: ", data);
+          } catch (error) {
+            console.error("Error: ", error);
+          }
+        };
+
+        sendPostRequest()
+    }, [number])
+
+
+
 
     const handleChange = (event) => {
         const name = event.target.name
@@ -11,13 +38,12 @@ export default function Form (){
         setInputs(values => ({...values, [name]: value}))
     }
 
-    fetch()
-
     const handleSubmit = (event) => {
         event.preventDefault()
         const nama = inputs.nama || ""
         const keperluan = inputs.keperluan || ""
         if(nama !== "" && keperluan !== ""){
+            setNumber(number + 1)
             confirm(`Halo ${nama}, apakah keperluan kamu adalah ${keperluan}`)
             navigate('/ticket', {state: {nama}})
         }else{
