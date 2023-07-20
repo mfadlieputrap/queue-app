@@ -11,6 +11,8 @@ export default function Form (){
         setInputs(values => ({...values, [name]: value}))
     }
 
+    fetch()
+
     const handleSubmit = (event) => {
         event.preventDefault()
         const nama = inputs.nama || ""
@@ -27,7 +29,7 @@ export default function Form (){
     return(
         <>
             <div className='center absolute divForm w-2/5  rounded-2xl shadow-lg h-max'>
-                <h2  className="mx-auto w-max font-semibold text-3xl pt-12 pb-11">Pengajuan Surat-Surat</h2>
+                <h2  className="mx-auto w-max font-semibold text-3xl pt-12 pb-11"></h2>
                 <form onSubmit={handleSubmit}>
                     <div className=" grid grid-cols-1 w-3/4 m-auto ">
                         <label 
