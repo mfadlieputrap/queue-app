@@ -1,16 +1,30 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
 export default function Display(){
-    const queue = [];
+    const [number, setNumber] = useState()
+
+    useEffect(()=>{
+        axios.get('http://localhost:3030/api/display')
+        .then((response)=>{
+            console.log(response.data)
+            setNumber(response.data.number)
+        })
+        .catch((err)=>{
+            console.log(err)
+        })
+    })
+    
+
     return(
         <>
             <div className='absolute flex flex-row flex-wrap justify-between w-10/12 p-10 center h-5/6 gap-14'>
-                <div className='box-content flex flex-col justify-between shadow-xl basis-3/12 rounded-3xl'>
+                <div className='box-content flex flex-col justify-between shadow-xl basis-3/12 rounded-3xl'> 
                     <div className='relative p-10 border-b-8 border-blue-600 border-solid h-1/5 rounded-t-3xl'>
                         <span className='absolute text-3xl font-bold center'>Antrian</span>
                     </div>
                     <div className='relative p-10 h-2/5'>
-                        <span className='absolute font-bold center text-8xl'>010</span>
+                        <span className='absolute font-bold center text-8xl'>{number}</span>
                     </div>
                     <div className='relative p-10 border-t-8 border-blue-600 border-solid h-1/5 rounded-b-3xl'>
                         <span className='absolute text-3xl font-bold center'>Counter ?</span>
